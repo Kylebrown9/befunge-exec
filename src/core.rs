@@ -26,12 +26,12 @@ pub enum Direction {
 /// The mode of the program
 pub enum Mode {
     /// Quotation mode
-    /// Each command that is not Quote (") is interpreted
-    /// as a push of its own ascii value
-    Quote,
+    /// Each command that is not a double quote (") is interpreted as a push of its own ascii value.
+    /// The double quote command returns the cursor to normal mode
+    Stringmode,
     /// Normal mode
     /// Commands are interpretted as opcodes
-    Normal
+    Normalmode
 }
 
 #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug)]

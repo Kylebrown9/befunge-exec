@@ -40,7 +40,7 @@ impl<P> From<P> for Interpreter<P>
         let cursor = Cursor {
             pos: Position { x: 0, y: 0 },
             dir: Direction::Right,
-            mode: Mode::Normal
+            mode: Mode::Normalmode
         };
 
         Interpreter {
@@ -117,14 +117,14 @@ impl<P> Interpreter<P> where P: Program {
         let opcode = self.get_opcode(self.cursor.pos);
     
         match self.cursor.mode {
-            Mode::Quote => self.step_quoted(opcode),
-            Mode::Normal => self.step_unquoted(opcode)
+            Mode::Stringmode => self.step_quoted(opcode),
+            Mode::Normalmode => self.step_unquoted(opcode)
         }
     }
 
     fn step_quoted(&mut self, opcode: u8) -> Status {
         match opcode {
-            b'"' => self.cursor.mode = Mode::Normal,
+            b'"' => self.cursor.mode = Mode::Normalmode,
             _    => self.stack.push(opcode)
         }
         self.move_auto();
@@ -228,7 +228,7 @@ impl<P> Interpreter<P> where P: Program {
                 Status::Completed
             },
             b'"' => {
-                self.cursor.mode = Mode::Quote;
+                self.cursor.mode = Mode::Stringmode;
                 self.move_auto();
                 Status::Completed
             },
@@ -254,9 +254,9 @@ impl<P> Interpreter<P> where P: Program {
             },
             b'.' => {
                 let value = self.pop();
-                for byte in format!("{}", value).as_bytes() {
-                    self.output_buffer.push(*byte);
-                }
+                // Format the number and append a space " "
+                let formatted_val = format!("{} ", value); 
+                self.output_buffer.extend_from_slice(&formatted_val.as_bytes());
                 self.output_buffer.push(b' ');
                 self.move_auto();
                 Status::Completed
